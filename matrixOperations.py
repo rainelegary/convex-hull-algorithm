@@ -6,25 +6,45 @@ def calcInverse(mat):
 	size = len(mat)
 	echelonMat = combineMatLeftRight(mat, identityMatrix(size))
 	echelonMat = rowEchelon(echelonMat)
-	invMat = splitMatLeftRight(echelonMat, size)
+	invMat = splitMatLeftRight(echelonMat, size)[1]
 	return invMat
 
 
 def rowEchelon(mat):
-	pass
+	for rowN in range(len(mat)):
+		mat = nextRowOperations(mat, rowN)
+	return mat
 
 
 def nextRowOperations(mat, rowN):
-	pass
+	# swap to appropriate row
+	rowToSwap = needsRowSwap(mat, rowN)
+	mat = swapRows(mat, rowN, rowToSwap)
+
+	# multiply row 
+	colN = findFirstInList(mat[rowN], 0, avoid=True)
+	rowMult = 1/mat[rowN][colN]
+	mat = multRow(mat, rowN, rowMult)
+
+	# add row to other rows
+	mat = zeroColumn(mat, rowN, colN)
+
+	return mat
 
 
 def needsRowSwap(mat, rowN):
-	if mat[rowN][rowN] != 0:
-		return rowN
-	
+	for colN in range(rowN, len(mat[0])):
+		colList = jColExtract(mat, colN)
+		for rowM in range(rowN, len(mat)):
+			if colList[rowM] != 0: return rowM
 
 
-	
+def zeroColumn(mat, rowN, colN):
+	for rowM in range(len(mat)):
+		if rowM != rowN:
+			multiplier = mat[rowM][colN]/mat[rowN][colN]
+			for colM in range(len(mat[0])): mat[rowM][colM] -= mat[rowN][colM] * multiplier
+	return mat
 
 
 def isInvertible(mat):
@@ -35,17 +55,20 @@ def isInvertible(mat):
 def determinant(mat):
 	if len(mat) == 2: return mat[0][0]*mat[1][1]-mat[0][1]*mat[1][0]
 	det = 0
-	for elN in mat[0]:
+	for elN in range(len(mat[0])):
 		num = mat[0][elN]*cofactor(mat, 0, elN)
 		det += num
-	return num
+	return det
 
 
 def cofactor(mat, i, j):
+	matCopy = list(mat)
 	mult = pow(-1, i + j)
 	ijMat = []
-	for rowN in range(len(mat)): 
-		if rowN != i: ijMat.append(mat[rowN].pop(j))
+	for rowN in range(len(matCopy)): 
+		if rowN != i:
+			matCopy[rowN] = removeAtIndex(matCopy[rowN], j)
+			ijMat.append(matCopy[rowN])
 	ijMinor = determinant(ijMat)
 	return mult*ijMinor
 	
@@ -121,7 +144,34 @@ def identityMatrix(n):
 	matI = []
 	for row in range(n):
 		matI.append([])
-		for elN in range(n): matI[row][elN] = 0
+		for elN in range(n): matI[row].append(0)
 		matI[row][row] = 1
 	return matI
+
+
+def findFirstInList(listL, item, avoid=False):
+	for elN in range(len(listL)):
+		if listL[elN] == item and not avoid or listL[elN] != item and avoid: return elN
+	return None
+
+
+def countInList(listL, item):
+	count = 0
+	for el in listL:
+		if el == item: count += 1
+	return count
+
+
+def removeAtIndex(listL, index):
+	newList = []
+	for elN in range(len(listL)):
+		if elN != index: newList.append(listL[elN])
+	return newList
+
+
+print([3, 4, 6].pop())
+print(determinant(identityMatrix(3)))
+print(calcInverse(
+	[[1, 2, 0], [4, 5, 6], [8, 9, 10]]
+))
 
