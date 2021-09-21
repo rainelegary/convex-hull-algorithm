@@ -1,6 +1,6 @@
 import sys
 
-def calcInverse(mat):
+def matInverse(mat):
 	if not isInvertible(mat):
 		sys.exit("Matrix is not invertible")
 	size = len(mat)
@@ -171,7 +171,7 @@ def removeAtIndex(listL, index):
 
 print([3, 4, 6].pop())
 print(determinant(identityMatrix(3)))
-print(calcInverse(
+print(matInverse(
 	[[1, 2, 0], [4, 5, 6], [8, 9, 10]]
 ))
 
