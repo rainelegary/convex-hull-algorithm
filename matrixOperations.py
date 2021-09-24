@@ -98,7 +98,7 @@ def matMul(matA, matB):
 	tableM = transpose(matB)
 	for rowA in matA: 
 		for rowM in tableM: matF.append(dotProduct(rowA, rowM))
-	return matF
+	return [matF]
 		
 
 def transpose(matrix):
@@ -168,10 +168,4 @@ def removeAtIndex(listL, index):
 		if elN != index: newList.append(listL[elN])
 	return newList
 
-
-print([3, 4, 6].pop())
-print(determinant(identityMatrix(3)))
-print(matInverse(
-	[[1, 2, 0], [4, 5, 6], [8, 9, 10]]
-))
 
