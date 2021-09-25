@@ -169,3 +169,17 @@ def removeAtIndex(listL, index):
 	return newList
 
 
+def flipVector(vector):
+	for component in vector: component *= -1
+	return vector 
+
+
+def sumVectors(vectorList):
+	return [sum(vector[component] for vector in vectorList) for component in range(len(vectorList[0]))]
+
+
+def subtractVectors(v1, v2):
+	v2 = flipVector(v2)
+	return sumVectors([v1, v2])
+
+
