@@ -26,13 +26,3 @@ def barycentric(simplex, point, simplexMat):
 	lambdaVec[0].append(finalLambda)
 	return lambdaVec 
 
-
-def calcDistance(dirVector, point):
-	distance = sum(point[0][comp]*dirVector[0][comp] for comp in range(len(point[0])))
-	return distance
-
-
-def unitVec(vector):
-	length = pow(sum(comp*comp for comp in vector[0]), 1/2)
-	unitVec = [[comp/length for comp in vector[0]]]
-	return unitVec

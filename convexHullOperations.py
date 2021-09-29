@@ -1,5 +1,5 @@
 from matrixOperations import flipVector, identityMatrix, matMul, sumVectors, transpose, matInverse
-from linearAlgebra import pointsToPlane
+from linearAlgebra import pointsToPlane, simpToPlane
 import math
 
 
@@ -16,21 +16,11 @@ def selectFirstDirections(dims):
 	return simplex
 
 
-def newDirection(oldSimplex, missingVertex):
-	# calculate direction of missing vertex from the plane
-	# - find scalar form of plane
-	# - each directional component of the vector will be a constant from the plane's scalar form
-	# invert that direction; that's the direction this function should return
-	oldVertex = oldSimplex[missingVertex]
-	oldSimplex.pop(missingVertex)
-	testPoint = oldSimplex[0]
-	dVec = pointsToPlane(oldSimplex)[0]
-	if pointDistance(sumVectors([dVec, testPoint]), oldVertex) < pointDistance(testPoint, oldVertex): dVec = flipVector(dVec)
-	return dVec
+def newDirection(simplex, missingVertex):
+	return simpToPlane(simplex, missingVertex)[0]
 
-	
 
-def defineHullCenter(points): # prob won't actually need this function
+def defineHullCenter(points):
 	nPoints = len(points)
 	components = [[] for dim in range(len(points[0]))]
 	for point in points:
@@ -39,9 +29,6 @@ def defineHullCenter(points): # prob won't actually need this function
 	centerPoint = [component[nPoints // 2] for component in components]
 	return centerPoint
 
-
-def pointDistance(pointA, pointB):
-	return math.sqrt(sum(pointA[i]*pointB[i] for i in range(len(pointA))))
 
 
 print(newDirection(identityMatrix(3) + [[1, 2, 3]], 0))
