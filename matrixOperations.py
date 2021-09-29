@@ -96,9 +96,9 @@ def addRow(mat, baseRow, addedRow):
 def matMul(matA, matB):
 	matF = []
 	tableM = transpose(matB)
-	for rowA in matA: 
-		for rowM in tableM: matF.append(dotProduct(rowA, rowM))
-	return [matF]
+
+	matF = [[dotProduct(rowA, rowM) for rowM in tableM] for rowA in matA]
+	return matF
 		
 
 def transpose(matrix):
@@ -168,4 +168,20 @@ def removeAtIndex(listL, index):
 		if elN != index: newList.append(listL[elN])
 	return newList
 
+
+def flipVector(vector):
+	for componentN in range(len(vector)): vector[componentN] *= -1
+	return vector 
+
+
+def sumVectors(vectorList):
+	return [sum(vector[component] for vector in vectorList) for component in range(len(vectorList[0]))]
+
+
+def subtractVectors(v1, v2):
+	v2 = flipVector(v2)
+	return sumVectors([v1, v2])
+
+# print(subtractVectors(identityMatrix(2)[0], identityMatrix(2)[1]))
+# print(matMul([[1, 0], [0, 1]], [[1], [1]]))
 
