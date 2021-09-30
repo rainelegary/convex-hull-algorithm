@@ -1,4 +1,6 @@
-from matrixOperations import dotProduct, identityMatrix, matMul, sumVectors, subtractVectors, matInverse, transpose, flipVector
+from listOperations import vecToList
+from matrixOperations import dotProduct, identityMatrix, matMul, unitVec
+from matrixOperations import sumVectors, subtractVectors, matInverse, transpose, flipVector, tinyVector
 from random import random
 import math
 
@@ -10,17 +12,12 @@ def pointsToPlane(points):
 	dotProdVec = transpose([[0] * (len(points) - 1) + [1]])
 
 	constantsVec = matMul(matInverse(vectorMat), dotProdVec)
-	constants = transpose(constantsVec)[0]
+	constants = unitVec(vecToList(constantsVec))
+
 	quantity = dotProduct(constants, points[0])
 	
 	plane = (constants, quantity)
 	return plane
-
-
-def unitVec(vector):
-	length = pow(sum(comp*comp for comp in vector[0]), 1/2)
-	unitVec = [[comp/length for comp in vector[0]]]
-	return unitVec
 
 
 def pointDistance(pointA, pointB):
@@ -53,11 +50,6 @@ def simplexMissingVert(simplex, vertIndex):
 	simplex.pop(vertIndex)
 	return simplex
 
-
-def tinyVector(vector):
-	for compN in range(len(vector)):
-		vector[compN] *= 1/1000000
-	return vector
 
 
 # print(pointsToPlane([[4, 0, 3], [0, 0, 1], [10, 0, 5]]))
