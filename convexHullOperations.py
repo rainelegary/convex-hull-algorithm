@@ -1,7 +1,16 @@
 from matrixOperations import flipVector, identityMatrix, matMul, sumVectors, transpose, matInverse
-from linearAlgebra import pointsToPlane, simpToPlane
+from linearAlgebra import directionalDistance, pointsToPlane, simpToPlane
 import math
 
+
+def firstSimplex(dims, points):
+	vertices = []
+	directions = selectFirstDirections(dims)
+	for direction in directions:
+		vertex = findFarthestPoint(points, direction)
+		vertices.append(vertex)
+	return vertices
+		
 
 def selectFirstDirections(dims): 
 	# https://math.stackexchange.com/questions/2533532/how-to-find-the-coordinates-of-an-n-dimensional-rectangular-simplex
@@ -28,6 +37,18 @@ def defineHullCenter(points):
 	for component in components: component.sort()
 	centerPoint = [component[nPoints // 2] for component in components]
 	return centerPoint
+
+
+def findFarthestPoint(points, dirVec):
+	greatestDistance = 0
+	farthestPoint = [0, 0, 0]
+	for point in points:
+		distance = directionalDistance(dirVec, point)
+		if distance > greatestDistance:
+			greatestDistance = distance
+			farthestPoint = point
+	return farthestPoint
+
 
 
 

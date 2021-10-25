@@ -1,5 +1,5 @@
 from barycentric import *
-
+from objectManagement import *
 
 def hullMainScript():
 	simplex = [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
