@@ -1,12 +1,8 @@
 from barycentric import *
-from objectManagement import *
+from objectManagement import Simplex, ObjectInterface, firstSimplex, generatePoints
 
 def hullMainScript():
-	simplex = [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
-	simpMat = simplexMatrix(simplex)
-	point = [[0, 0.5001, 0.5, 0]]
-	print(pointInside(simplex, point, simpMat))
-
+	objectInt = ObjectInterface()
 
 if __name__ == '__main__':
 	hullMainScript()

@@ -1,49 +1,75 @@
 from linearAlgebra import simpToPlane
 from nonBarycentic import relativeSimpLocation
-from convexHullOperations import selectFirstDirections
+from convexHullOperations import firstSimplex
+from randomPoints import generatePoints
+from convexHullLab import HullSettings
 
 
 class ObjectInterface:
-	def __init__(self, name, dimensions):
-		self.name = name
-		self.dimensions = dimensions
-		self.points = PointList()
-		self.simplexTree = SimplexTree()
-		self.objectReferences = self.setupObjectReferences()
+	def __init__(self, dimensions):
+		self.__hullSettings = HullSettings(3, 1000)
+		self.__dims = self.__hullSettings.dimensions
+		self.__starterPoints = StarterPoints()
+		self.__simplexTree = SimplexTree()
+		self.__objRef = self.setupObjectReferences()
 
 
 	def setupObjectReferences(self):
 		objectReferences = {}
-		objectReferences['points'] = {}
-		objectReferences['simplices'] = {}
-		objectReferences['simplex faces'] = {}
-		self.objectReferences = objectReferences
+		objectReferences['point'] = {}
+		objectReferences['simplex'] = {}
+		objectReferences['face'] = {}
+		self.__objRef = objectReferences
 
 
-	def firstGeneration(self):
+	def getPoint(self, pointName):
+		return self.__objRef['point'][pointName]
+
+
+	def getSimplex(self, simplexName):
+		return self.__objRef['simplex'][simplexName]
+
+
+	def getFace(self, faceName):
+		return self.__objRef['face'][faceName]
+
+
+	def __firstGeneration(self):
+		mainSimplex = Simplex("simplex_l0_0", firstSimplex(self.__dims, self.__starterPoints.points))
+
+
+	
+	def __newGeneration(self):
+		# simplex parents and children
+		pass
+
+
+	def __boundaryChecks(self):
+		# simplex face's point lists
 		pass
 
 	
-	def newGeneration(self):
-		pass
-
-
-	def boundaryChecks(self):
-		pass
-
-	
-	def pointUpdates(self):
+	def __pointUpdates(self):
 		pass
 
 
 	def objectManagerMain(self):
-		# create first simplex
-		mainSimplex = Simplex("simplex0",)
+		self.__firstGeneration()
+		
 	
 
 class PointList:
 	def __init__(self):
 		self.points = []
+
+
+class StarterPoints(PointList):
+	def __init__(self):
+		self.points = self.pointGeneration()
+
+
+	def pointGeneration(self):
+		return generatePoints(HullSettings.numPoints, HullSettings.dimensions)
 
 
 class Point:
@@ -55,14 +81,21 @@ class Point:
 
 class SimplexTree:
 	def __init__(self):
-		self.tree = {'root': {}, 'layer 1': {}, 'layer 2': {}}
+		self.tree = {'layer0': {}, 'layer1': {}, 'layer2': {}}
 
 
 class Simplex:
-	def __init__(self, name: str, vertices: list):
+	def __init__(self, name, parent, vertices):
 		self.name = name
+		self.parent = parent
 		self.vertices = vertices
+		self.newestVertex = -1
 		self.faces = self.__generateFaces()
+		self.children = []
+
+
+	def setChildren(self, children):
+		self.children = children
 
 
 	def checkCluster(self, cluster):
@@ -79,7 +112,7 @@ class SimplexFace:
 		self.name = name
 		self.vertexNames = []
 		self.plane = None
-		self.eligiblePoints = {}
+		self.eligiblePoints = PointList()
 		self.simplexChild = None
 
 
