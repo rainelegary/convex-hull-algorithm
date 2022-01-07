@@ -1,0 +1,2 @@
+dimensions: 3
+number of points: 100

@@ -13,11 +13,8 @@ def matInverse(mat):
 
 
 def matMul(matA, matB):
-	matF = []
 	tableM = transpose(matB)
-
-	matF = [[dotProduct(rowA, rowM) for rowM in tableM] for rowA in matA]
-	return matF
+	return [[dotProduct(rowA, rowM) for rowM in tableM] for rowA in matA]
 
 
 def determinant(mat):
@@ -30,20 +27,19 @@ def determinant(mat):
 
 
 def isInvertible(mat):
-	if len(mat) != len(mat[0]) or determinant(mat) == 0: return False
-	else: return True
+	return len(mat) == len(mat[0]) and determinant(mat) != 0
 
 
 def cofactor(mat, i, j):
 	matCopy = list(mat)
-	mult = pow(-1, i + j)
+	multiplier = pow(-1, i + j)
 	ijMat = []
 	for rowN in range(len(matCopy)): 
 		if rowN != i:
 			matCopy[rowN] = removeAtIndex(matCopy[rowN], j)
 			ijMat.append(matCopy[rowN])
 	ijMinor = determinant(ijMat)
-	return mult*ijMinor
+	return multiplier*ijMinor
 		
 
 def transpose(matrix):
@@ -51,23 +47,15 @@ def transpose(matrix):
 
 
 def dotProduct(u, v):
-	sum = 0
-	for el in range(len(u)): sum += u[el] * v[el]
-	return sum
+	return sum(u[el]*v[el] for el in range(len(u)))
 
 	
-def identityMatrix(n):
-	matI = []
-	for row in range(n):
-		matI.append([])
-		for elN in range(n): matI[row].append(0)
-		matI[row][row] = 1
-	return matI
+def identityMatrix(dimensions: int):
+	return [[(1 if elN == row else 0) for elN in range(dimensions)] for row in range(dimensions)]
 
 
 def flipVector(vector):
-	for componentN in range(len(vector)): vector[componentN] *= -1
-	return vector 
+	return [-vector[componentN] for componentN in range(len(vector))]
 
 
 def sumVectors(vectorList):
@@ -75,13 +63,11 @@ def sumVectors(vectorList):
 
 
 def subtractVectors(v1, v2):
-	v2 = flipVector(v2)
-	return sumVectors([v1, v2])
+	return sumVectors([v1, flipVector(v2)])
 
 
 def unitVec(vector):
-	length = vectorLength(vector)
-	return multVector(vector, 1/length)
+	return multVector(vector, 1/vectorLength(vector))
 
 
 def multVector(vector, multiplier):
@@ -90,14 +76,4 @@ def multVector(vector, multiplier):
 
 def vectorLength(vector):
 	return pow(sum(comp*comp for comp in vector), 1/2)
-
-
-def tinyVector(vector):
-	for compN in range(len(vector)):
-		vector[compN] *= 1/1000000
-	return vector
-
-
-# print(subtractVectors(identityMatrix(2)[0], identityMatrix(2)[1]))
-# print(matMul([[1, 0], [0, 1]], [[1], [1]]))
 

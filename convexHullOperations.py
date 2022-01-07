@@ -1,6 +1,18 @@
 from matrixOperations import flipVector, identityMatrix, matMul, sumVectors, transpose, matInverse
-from linearAlgebra import directionalDistance, pointsToPlane, simpToPlane
 import math
+from random import uniform
+
+def generatePoints(dimensions, numPoints):
+	points = []
+	for dim in range(dimensions): 
+		for pointN in range(numPoints):
+			pointFound = False
+			while not pointFound:
+				point = [uniform() for dim in range(dimensions)]
+				if sum([c*c for c in point]) <= 1:
+					points.append(point)
+					pointFound=True
+	return points
 
 
 def firstSimplex(dims, points):
@@ -26,7 +38,7 @@ def selectFirstDirections(dims):
 
 
 def newDirection(simplex, missingVertex):
-	return simpToPlane(simplex, missingVertex)[0]
+	return simplexToPlane(simplex, missingVertex)[0]
 
 
 def defineHullCenter(points):
@@ -41,7 +53,7 @@ def defineHullCenter(points):
 
 def findFarthestPoint(points, dirVec):
 	greatestDistance = 0
-	farthestPoint = [0, 0, 0]
+	farthestPoint = [0 for i in range(len(dirVec))]
 	for point in points:
 		distance = directionalDistance(dirVec, point)
 		if distance > greatestDistance:

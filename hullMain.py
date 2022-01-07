@@ -1,8 +1,11 @@
-from barycentric import *
-from objectManagement import Simplex, ObjectInterface, firstSimplex, generatePoints
+from objectManagement import ObjectInterface
 
-def hullMainScript():
+def main():
+	runConvexHull()
+
+def runConvexHull():
 	objectInt = ObjectInterface()
+	objectInt.run()
 
 if __name__ == '__main__':
-	hullMainScript()
+	main()
