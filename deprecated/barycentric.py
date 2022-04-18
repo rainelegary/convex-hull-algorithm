@@ -1,5 +1,7 @@
-from matrixOperations import *
 
+
+
+# this module is probably not needed, most likley will use something simpler than barycentric coordinates
 
 def pointInside(simplex, point, simplexMat):
 	lambdaVec = barycentric(simplex, point, simplexMat)
