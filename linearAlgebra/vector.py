@@ -1,28 +1,38 @@
+from geometricObjects.point import Point
+
+
 class Vector:
-	def __init__():
-		pass
+	def __init__(self, vec):
+		self.vec = vec
+		self.dims = len(vec)
 
 	@staticmethod
 	def dotProduct(u, v):
-		return sum(u[el]*v[el] for el in range(len(u)))
+		return sum(u.vec[el]*v.vec[el] for el in range(len(u.vec)))
+
 
 	@staticmethod
-	def flipVector(vector):
-		return [-vector[componentN] for componentN in range(len(vector))]
+	def flipped(vector):
+		return Vector([-vector.vec[i] for i in range(vector.dims)])
+
+
+	def flip(self):
+		self.vec = [-self.vec[i] for i in range(self.dims)]
 
 
 	@staticmethod
 	def sumVectors(vectorList):
-		return [sum(vector[component] for vector in vectorList) for component in range(len(vectorList[0]))]
+		vectorSize = len(vectorList[0].vec)
+		return [sum(v.vec[i] for v in vectorList) for i in range(vectorSize)]
 
 
 	@staticmethod
 	def subtractVectors(v1, v2):
-		return sumVectors([v1, flipVector(v2)])
+		return Vector.sumVectors([v1, Vector.flipped(v2)])
 
 
 	@staticmethod
-	def unitVec(vector):
+	def asUnitVec(vector):
 		return multVector(vector, 1/vectorLength(vector))
 
 
@@ -44,3 +54,8 @@ class Vector:
 	@staticmethod
 	def vecToList(vec):
 		return [vec[compN][0] for compN in range(len(vec))]
+
+
+	def asPoint(self):
+		return Point(self.vec)
+

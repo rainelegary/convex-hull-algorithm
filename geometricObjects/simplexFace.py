@@ -1,42 +1,42 @@
+import random
+from geometricObjects.plane import Plane
+from geometricObjects.point import Point
+from linearAlgebra.matrix import Matrix
+from linearAlgebra.vector import Vector
+
+
 class SimplexFace:
-    def __init__(self, simplex, vertexToRemove):
-        self.simplexParent = simplex
-        self.vertices = self.initializeVertices(simplex, vertexToRemove)
-        self.oldVertex = simplex.vertices[vertexToRemove]
-        self.plane = self.calculatePlane()
-        self.eligiblePoints = PointCluster()
-        self.simplexChild = None
+    def __init__(self, simplex, missingVertex):
+        self.dims = simplex.dims
+        self.missingVertex = missingVertex
+        self.vertices = simplex.vertices
+        self.vertices.remove(missingVertex)
+        self.plane = self.initializePlane()
+        self.dirVec = self.plane.dirVec
 
 
-    def initializeVertices(self, simplex, vertexToRemove):
-        vertices = list(simplex.vertices)
-        vertices.pop(vertexToRemove)
-        return vertices
-
-
-    def calculatePlane(self):
+    def initializePlane(self):
         # linear algebra
-        points = self.vertices
-        vectorMat = [subtractVectors(points[0].location, points[i].location) for i in range(1, len(points))]
-        vectorMat.append([random() for i in range(len(points[0].location))])
-        dotProdVec = transpose([[0] * (len(points) - 1) + [1]])
-        constantsVec = matMul(matInverse(vectorMat), dotProdVec)
-        constants = unitVec(vecToList(constantsVec))
-        quantity = dotProduct(constants, points[0].location)
-        plane = Plane(constants, quantity)
+        vectors = [vertex.asVector() for vertex in self.vertices]
+        vectorMat = [Vector.subtractVectors(vectors[0], vectors[i]) for i in range(1, self.dims)]
+        vectorMat.append([random() for i in range(self.dims)])
+        dotProdVec = Vector([[0] * (self.dims - 1) + [1]])
+        coefficients = Matrix.getInverse(vectorMat).multVec(dotProdVec).asUnitVec()
+        quantity = Vector.dotProduct(coefficients, vectors[0])
+        plane = Plane(coefficients, quantity)
 
 
         # orient plane away from old vertex
-        somePointOnFace = self.vertices[0]
+        testPoint = self.vertices[0]
 
-        samplePointAlong = Point(sumVectors([plane.dirVec, somePointOnFace.location]))
-        samplePointAgainst = Point(sumVectors([flipVector(plane.dirVec), somePointOnFace.location]))
-        if self.oldVertex.distanceFromPoint(samplePointAlong) < self.oldVertex.distanceFromPoint(samplePointAgainst):
-            plane.dirVec = flipVector(plane.dirVec)
+        pointAlongVec = Point(Vector.sumVectors([plane.coefficients, testPoint.coords]))
+        pointAgainstVec = Point(Vector.sumVectors([Vector.flipped(plane.coefficients), testPoint.coords]))
+        if self.oldVertex.distanceFromPoint(pointAlongVec) < self.oldVertex.distanceFromPoint(pointAgainstVec):
+            plane.coefficients.flip()
             plane.quantity *= -1
 
         return plane
 
 
-    def containsPoint(self, point):
-        return dotProduct(self.plane.dirVec, point.location) <= self.plane.quantity
+    def facesPoint(self, point):
+        return Vector.dotProduct(self.plane.coefficients, point.coords.asVector()) <= self.plane.quantity

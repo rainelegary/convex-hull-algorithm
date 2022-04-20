@@ -1,16 +1,25 @@
+import math
+
+from linearAlgebra.vector import Vector
+
+# updated
 class Point:
-    def __init__(self, location):
-        self.location = location
-        self.eligibleFaces = []
+    def __init__(self, coords):
+        self.coords = coords
+        self.dims = len(coords)
 
 
     def distanceFromPoint(self, otherPoint):
-        return math.sqrt(sum(pow(self.location[i]-otherPoint.location[i], 2) for i in range(len(self.location))))
+        return math.sqrt(sum(pow(self.coords[i]-otherPoint.coords[i], 2) for i in range(self.dims)))
 
     
     def directionalDistance(self, dirVector):
-        return sum(self.location[comp]*dirVector[comp] for comp in range(len(self.location)))
+        return sum(self.coords[i]*dirVector[i] for i in range(self.dims))
 
 
-    def locationRelativeToSimplex(self, simplex: Simplex):
-        return [simplexFace.containsPoint(self) for simplexFace in simplex.faces]   
+    def locationRelativeToSimplex(self, simplex):
+        return [not simplexFace.facesPoint(self) for simplexFace in simplex.faces]   
+
+    
+    def asVector(self):
+        return Vector(self.coords)

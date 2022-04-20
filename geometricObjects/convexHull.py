@@ -1,20 +1,22 @@
+from geometricObjects.simplex import Simplex
 from matrixOperations import sumVectors, subtractVectors, matInverse, transpose, flipVector, dotProduct, matMul, unitVec, vecToList
 from random import random
 import math
 
 
 class ConvexHull:
-    def __init__(self, dims):
-        self.dims = dims
+    def __init__(self, pointCluster):
+        self.pointCluster = pointCluster
+        self.dims = pointCluster.dims
 
 
     def firstSimplex(self):
-        simp = Simplex()
+        vertices = []
         directions = self.selectFirstDirections()
         for direction in directions:
-            vertex = findFarthestPoint(points, direction)
+            vertex = self.pointCluster.findFarthestPoint(direction)
             vertices.append(vertex)
-        return vertices
+        return Simplex(vertices)
 
 
     def selectFirstDirections(self): 
@@ -25,7 +27,8 @@ class ConvexHull:
         translationConst = -(a+1)/(dims+1)
 
         directionVectors = [[0 + translationConst] * dims] * dims
-        for dim in range(dims): directionVectors[dim][dim] = 1 + translationConst
+        for dim in range(dims): 
+            directionVectors[dim][dim] = 1 + translationConst
         
         directionVectors.append([a + translationConst] * dims)
         return directionVectors

@@ -1,11 +1,18 @@
+from linearAlgebra.vector import Vector
+
+
 class Matrix:
-	def __init__(self):
-		pass
+	def __init__(self, mat):
+		self.mat = mat
 
 
-	def matMul(self, matA, matB):
+	def multMat(self, matA, matB):
 		tableM = transpose(matB)
 		return [[dotProduct(rowA, rowM) for rowM in tableM] for rowA in matA]
+
+
+	def multVec(self, vector):
+		return Vector([])
 
 
 	def determinant(self):
@@ -34,7 +41,14 @@ class Matrix:
 			
 
 	def transpose(self):
-		return [getCol(matrix, col) for col in range(len(matrix[0]))]
+		self.mat = [getCol(matrix, col) for col in range(len(matrix[0]))]
+
+	
+	@staticmethod
+	def getTranspose(matrix):
+		mat = Matrix(matrix.mat)
+		mat.transpose()
+		return mat
 
 
 	def getInverse(self):
