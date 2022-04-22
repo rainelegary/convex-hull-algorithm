@@ -1,105 +1,159 @@
+from linearAlgebra.rowEchelon import RowEchelon
 from linearAlgebra.vector import Vector
+import copy
 
 
 class Matrix:
 	def __init__(self, mat):
-		self.mat = mat
+		self.rowCount = len(mat)
+		self.colCount = len(mat[0])
+		self.mat = copy.deepcopy(mat)
+		self.rows = copy.deepcopy(mat)
+		self.cols = self.__initializeCols()
+		self.cofactors = None
+		self.determinant = None
+		self.inverse = None
+
+	
+	def __initializeCols(self):
+		columns = [[self.rows[row][col] for row in range(self.rowCount)] for col in range(self.colCount)]
+		return columns
+
+	
+	def __initializeNoneCofactors(self):
+		cofactors = [[None for col in range(self.colCount)] for row in range(self.rowCount)]
+		return cofactors
 
 
-	def multMat(self, matA, matB):
-		tableM = transpose(matB)
-		return [[dotProduct(rowA, rowM) for rowM in tableM] for rowA in matA]
+	def multMatrix(self, matrix):
+		if self.colCount != matrix.rowCount:
+			raise Exception("Cannot multiply matrix: mismatched sizes")
+		return Matrix([[Vector.listDotProduct(row, col) for col in matrix.cols] for row in self.rows])
 
 
-	def multVec(self, vector):
-		return Vector([])
+	def multVector(self, vector):
+		if self.colCount != vector.dims:
+			raise Exception("Cannot multiply vector: mismatched sizes")
+		return Vector([Vector.listDotProduct(row, Vector.vecToList(vector)) for row in self.rows])
 
 
-	def determinant(self):
-		if len(mat) == 2: return mat[0][0]*mat[1][1]-mat[0][1]*mat[1][0]
+	def getDeterminant(self):
+		if self.rowCount != self.colCount:
+			raise Exception("Cannot take determinant of a non-square matrix")
+
+		if self.determinant != None:
+			return self.determinant
+
+		mat = self.mat 
+		if self.rowCount == 2: 
+			det = mat[0][0]*mat[1][1]-mat[0][1]*mat[1][0]
+			self.determinant = det
+			return det
+
 		det = 0
-		for elN in range(len(mat[0])):
-			num = mat[0][elN]*cofactor(mat, 0, elN)
+		for i in range(self.dims):
+			num = mat[0][i]*self.getCofactor(mat, 0, i)
 			det += num
+		self.determinant = det
 		return det
 
 
-	def isInvertible(self):
-		return len(mat) == len(mat[0]) and determinant(mat) != 0
+	def getCofactor(self, row, col):
+		if self.cofactors == None:
+			self.cofactors = self.__initializeNoneCofactors()
 
+		if self.cofactors[row][col] != None:
+			return self.cofactors[row][col]
 
-	def cofactor(self, i, j):
-		matCopy = list(mat)
-		multiplier = pow(-1, i + j)
-		ijMat = []
-		for rowN in range(len(matCopy)): 
-			if rowN != i:
-				matCopy[rowN] = removeAtIndex(matCopy[rowN], j)
-				ijMat.append(matCopy[rowN])
-		ijMinor = determinant(ijMat)
-		return multiplier*ijMinor
+		matCopy = copy.deepcopy(self.mat)
+		multiplier = pow(-1, row + col)
+
+		matCopy.pop(row)
+		for rowN in range(len(matCopy)):
+			matCopy[rowN].pop(col)
+		
+		rowColMatrix = Matrix(matCopy)
+		rowColMinor = rowColMatrix.getDeterminant()
+
+		cofactor = multiplier * rowColMinor
+		self.cofactors[row][col] = cofactor
+		return cofactor
 			
 
-	def transpose(self):
-		self.mat = [getCol(matrix, col) for col in range(len(matrix[0]))]
-
-	
-	@staticmethod
-	def getTranspose(matrix):
-		mat = Matrix(matrix.mat)
-		mat.transpose()
-		return mat
+	def getTranspose(self):
+		return copy.deepcopy([self.getCol(col) for col in range(self.colCount)])
 
 
 	def getInverse(self):
-		if not MatrixOperations.isInvertible(mat):
-			sys.exit("Matrix is not invertible")
-		size = len(mat)
-		echelonMat = combineMatLeftRight(mat, identityMatrix(size))
-		echelonMat = rEchelon(echelonMat)
-		invMat = splitMatLeftRight(echelonMat, size)[1]
+		if not self.getInvertible():
+			raise Exception("Cannot invert an uninvertible matrix")
+		size = self.rowCount
+		rowEchelon = RowEchelon()
+		rowEchelonMat = Matrix.combineMatLeftRight(self, Matrix.identityMatrix(size))
+		rowEchelonMat = rowEchelon.compute(rowEchelonMat)
+		invMat = Matrix.splitMatLeftRight(rowEchelonMat, size)["right"]
 		return invMat
 
-	@staticmethod
-	def getRow(matrix, n):
-		return table[n]
+
+	def calculateCofactors(self):
+		self.cofactors = [[self.getCofactor(row, col) for col in range(self.colCount)] for row in range(self.rowCount)]
+
+
+	def getInvertible(self):
+		invertible = self.rowCount == self.colCount and self.getDeterminant() != 0
+		return invertible
+
+
+	def getRow(self, row):
+		return copy.deepcopy(self.rows[row])
+
+	
+	def getCol(self, col):
+		return copy.deepcopy(self.cols[col])
 
 
 	@staticmethod
-	def getCol(martix, n):
-		values = [table[row][n] for row in range(len(table))]
-		return values
-
-
-	@staticmethod
-	def identityMatrix(dimensions: int):
-		return [[(1 if elN == row else 0) for elN in range(dimensions)] for row in range(dimensions)]
+	def identityMatrix(dims):
+		return Matrix([[(1 if elN == row else 0) for elN in range(dims)] for row in range(dims)])
 
 
 	@staticmethod
 	def combineMatLeftRight(matA, matB):
-		for rowN in range(len(matA)):
-			for elN in matB[rowN]: 
-				matA[rowN].append(elN)
-		return matA
+		if matA.rowCount != matB.rowCount:
+			raise Exception("Cannot combine matrices: mismatched size")
+		
+		matA = Matrix(matA.mat)
+		matB = Matrix(matB.mat)
+		matC = Matrix([matA.mat[row] + matB.mat[row] for row in range(matA.rowCount)])
+		return matC
 
 
 	@staticmethod
 	def combineMatTopBottom(matA, matB):
-		for row in matB: 
-			matA.append(row)
-		return matA
+		if matA.colCount != matB.colCount:
+			raise Exception("Cannot combine matrices: mismatched size")
+
+		matA = copy.deepcopy(matA)
+		matB = copy.deepcopy(matB)
+		matC = Matrix(matA.mat + matB.mat)
+		return matC
 
 
 	@staticmethod
-	def splitMatLeftRight(mat, index):
-		matL = [mat[rowN][0:index] for rowN in range(len(mat))]
-		matR = [mat[rowN][index:len(mat[0])] for rowN in range(len(mat))]
-		return (matL, matR)
+	def splitMatLeftRight(matrix, index):
+		if not 0 <= index <  matrix.colCount:
+			raise Exception("Cannot split matrix: index out of bounds")
+		
+		matL = Matrix([matrix.mat[rowN][0:index] for rowN in range(matrix.rowCount)])
+		matR = Matrix([matrix.mat[rowN][index:matrix.colCount] for rowN in range(matrix.rowCount)])
+		return {"left": matL, "right": matR}
 
 
 	@staticmethod
-	def splitMatTopBottom(mat, index):
-		matT = [mat[rowN] for rowN in range(0, index)]
-		matB = [mat[rowN] for rowN in range(index, len(mat))]
-		return (matT, matB)
+	def splitMatTopBottom(matrix, index):
+		if not 0 <= index < matrix.rowCount:
+			raise Exception("Cannot split matrix: index out of bounds")
+
+		matT = Matrix([matrix.mat[rowN] for rowN in range(0, index)])
+		matB = Matrix([matrix.mat[rowN] for rowN in range(index, matrix.rowCount)])
+		return {"top": matT, "bottom": matB}

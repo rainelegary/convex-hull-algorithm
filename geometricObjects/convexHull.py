@@ -1,5 +1,5 @@
 from geometricObjects.simplex import Simplex
-from matrixOperations import sumVectors, subtractVectors, matInverse, transpose, flipVector, dotProduct, matMul, unitVec, vecToList
+from deprecated.matrixOperations import sumVectors, subtractVectors, matInverse, transpose, flipVector, dotProduct, matMul, unitVec, vecToList
 from random import random
 import math
 

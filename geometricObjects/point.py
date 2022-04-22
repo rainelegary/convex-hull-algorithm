@@ -1,11 +1,11 @@
 import math
-
+import copy
 from linearAlgebra.vector import Vector
 
 # updated
 class Point:
     def __init__(self, coords):
-        self.coords = coords
+        self.coords = copy.deepcopy(coords)
         self.dims = len(coords)
 
 

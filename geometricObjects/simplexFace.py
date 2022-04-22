@@ -12,7 +12,7 @@ class SimplexFace:
         self.vertices = simplex.vertices
         self.vertices.remove(missingVertex)
         self.plane = self.initializePlane()
-        self.dirVec = self.plane.dirVec
+        self.dirVec = self.plane.coefficients
 
 
     def initializePlane(self):
@@ -31,9 +31,9 @@ class SimplexFace:
 
         pointAlongVec = Point(Vector.sumVectors([plane.coefficients, testPoint.coords]))
         pointAgainstVec = Point(Vector.sumVectors([Vector.flipped(plane.coefficients), testPoint.coords]))
-        if self.oldVertex.distanceFromPoint(pointAlongVec) < self.oldVertex.distanceFromPoint(pointAgainstVec):
-            plane.coefficients.flip()
-            plane.quantity *= -1
+
+        if self.missingVertex.distanceFromPoint(pointAlongVec) < self.missingVertex.distanceFromPoint(pointAgainstVec):
+            plane = plane.getFlipped()
 
         return plane
 
